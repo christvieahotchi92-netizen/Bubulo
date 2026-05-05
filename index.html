@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BulletinPro CI_messou – Simulateur de Bulletin Ivoirien</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --bg: #f4f6fb;
+  --bg2: #ffffff;
+  --bg3: #eef1f8;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --accent: #1a56db;
+  --accent2: #1e429f;
+  --accent-light: #eff6ff;
+  --accent-soft: #bfdbfe;
+  --green: #059669;
+  --green-light: #ecfdf5;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --orange: #d97706;
+  --orange-light: #fffbeb;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
+  --shadow: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,.1), 0 4px 16px rgba(0,0,0,.06);
+  --r: 12px;
+  --r-sm: 8px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+}
+[data-theme="dark"] {
+  --bg: #0a0f1e;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --surface: #1e2a3a;
+  --border: #263548;
+  --border2: #334155;
+  --text: #f1f5f9;
+  --text2: #94a3b8;
+  --text3: #475569;
+  --accent: #3b82f6;
+  --accent2: #60a5fa;
+  --accent-light: rgba(59,130,246,.1);
+  --accent-soft: rgba(59,130,246,.25);
+  --green: #10b981;
+  --green-light: rgba(16,185,129,.1);
+  --red: #f87171;
+  --red-light: rgba(248,113,113,.1);
+  --orange: #fbbf24;
+  --orange-light: rgba(251,191,36,.1);
+  --purple: #a78bfa;
+  --purple-light: rgba(167,139,250,.1);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+  --shadow: 0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background .3s, color .3s;
+}
+
+h1, h2, h3 { font-family: 'DM Serif Display', serif; letter-spacing: -.02em; }
+h1 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+
+.app-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: #fff;
+}
+.logo span { color: var(--accent); }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.main { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-btn {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all .2s;
+}
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.center-text { text-align: center; }
+.success-msg { color: var(--green); font-weight: 700; }
+.link-box { 
+  background: var(--bg3); 
+  padding: 16px; 
+  border-radius: var(--r); 
+  margin: 16px 0;
+  word-break: break-all;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+}
+.link-box a { color: var(--accent); text-decoration: none; }
+.link-box a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📋</div>
+      <span>Bulletin<span>Pro</span> CI_messou</span>
+    </div>
+    <div class="header-actions">
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="card center-text">
+    <h1 style="margin-bottom:16px;">✅ Application Publiée!</h1>
+    <p style="font-size:.95rem;color:var(--text2);max-width:540px;margin:0 auto 28px;line-height:1.8;">
+      Votre <strong>Simulateur de Bulletin Scolaire Ivoirien</strong> est maintenant accessible en ligne! 🎓
+    </p>
+    
+    <div class="link-box">
+      <p style="color:var(--text3);margin-bottom:8px;font-size:.85rem;">📍 Votre lien public :</p>
+      <a href="https://christvieahotchi92-netizen.github.io/Bubulo/" target="_blank">
+        https://christvieahotchi92-netizen.github.io/Bubulo/
+      </a>
+    </div>
+    
+    <p style="color:var(--text2);font-size:.88rem;">
+      ✨ Partagez ce lien avec vos utilisateurs!
+    </p>
+  </div>
+</main>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const theme = html.getAttribute('data-theme');
+  const newTheme = theme === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  document.getElementById('themeBtn').textContent = newTheme === 'light' ? '🌙' : '☀️';
+}
+
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('themeBtn').textContent = savedTheme === 'light' ? '🌙' : '☀️';
+</script>
+
+</body>
+</html>
